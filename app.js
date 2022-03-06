@@ -49,36 +49,38 @@ app.use(
   })
 );
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
 function auth(req, res, next) {
   console.log(req.session);
   // console.log(req.headers); <-- for testing
   if (!req.session.user) {
-    const authHeader = req.headers.authorization;
+    // const authHeader = req.headers.authorization; <-- no longer used
     // console.log(req.headers.authorization); <-- for testing
-    if (!authHeader) {
-      const err = new Error('You are not authenticated!');
-      res.setHeader('WWW-Authenticate', 'Basic');
-      err.status = 401;
-      return next(err);
-    }
+    // if (!authHeader) { <-- no longer used
+    const err = new Error('You are not authenticated!');
+    // res.setHeader('WWW-Authenticate', 'Basic'); <-- no longer used, handled in ./routes/user.js
+    err.status = 401;
+    return next(err);
 
-    const auth = Buffer.from(authHeader.split(' ')[1], 'base64')
-      .toString()
-      .split(':');
-    const user = auth[0];
-    const pass = auth[1];
-    if (user === 'admin' && pass === 'password') {
-      req.session.user = 'admin';
-      // res.cookie('user', 'admin', { signed: true }); <-- no longer used
-      return next();
-    } else {
-      const err = new Error('You are not authenticated!');
-      res.setHeader('WWW-Authenticated', 'Basic');
-      err.status = 401;
-      return next(err);
-    }
+    // const auth = Buffer.from(authHeader.split(' ')[1], 'base64') <-- no longer used, handled in ./routes/user.js
+    //   .toString()
+    //   .split(':');
+    // const user = auth[0];
+    // const pass = auth[1];
+    // if (user === 'admin' && pass === 'password') {
+    //   req.session.user = 'admin';
+    //   // res.cookie('user', 'admin', { signed: true }); <-- no longer used
+    //   return next();
+    // } else {
+    //   const err = new Error('You are not authenticated!');
+    //   res.setHeader('WWW-Authenticated', 'Basic');
+    //   err.status = 401;
+    //   return next(err);
+    // }
   } else {
-    if (req.session.user === 'admin') {
+    if (req.session.user === 'authenticated') {
       return next();
     } else {
       const err = new Error('You are not authenticated!');
@@ -91,9 +93,6 @@ function auth(req, res, next) {
 app.use(auth);
 
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 app.use('/campsites', campsiteRouter);
 app.use('/promotions', promotionRouter);
