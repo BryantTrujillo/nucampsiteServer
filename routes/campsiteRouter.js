@@ -219,8 +219,10 @@ campsiteRouter
               })
               .catch((err) => next(err));
           } else {
+            const err = new Error('You are not the author of this comment!');
             res.statusCode = 403;
-            res.end();
+            return next(err);
+            // res.end(); <-- no longer used
           }
         } else if (!campsite) {
           err = new Error(`Campsite ${req.params.campsiteId} not found`);
@@ -253,8 +255,10 @@ campsiteRouter
               })
               .catch((err) => next(err));
           } else {
+            const err = new Error('You are not the author of this comment!');
             res.statusCode = 403;
-            res.end();
+            return next(err);
+            // res.end(); <-- no longer used
           }
         } else if (!campsite) {
           err = new Error(`Campsite ${req.params.campsiteId} not found`);
