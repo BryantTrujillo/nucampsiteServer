@@ -5,6 +5,8 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const jwt = require('jsonwebtoken');
 const FacebookTokenStrategy = require('passport-facebook-token');
+const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const LinkedinTokenStrategy = require('passport-linkedin-token').Strategy;
 
 const config = require('./config');
 
@@ -67,6 +69,70 @@ exports.facebookPassport = passport.use(
           user.facebookId = profile.id;
           user.firstname = profile.name.givenName;
           user.lastname = profile.name.familyName;
+          user.save((err, user) => {
+            if (err) {
+              return done(err, false);
+            } else {
+              return done(null, user);
+            }
+          });
+        }
+      });
+    }
+  )
+);
+
+exports.googlePassport = passport.use(
+  new GoogleTokenStrategy(
+    {
+      clientID: config.google.clientId,
+      clientSecret: config.google.clientSecret,
+    },
+    (accessToken, refreshToken, profile, done) => {
+      User.findOne({ googleId: profile.id }, (err, user) => {
+        if (err) {
+          return done(err, false);
+        }
+        if (!err && user) {
+          return done(null, user);
+        } else {
+          user = new User({ username: profile.name });
+          user.googleId = profile.id;
+          user.firstname = profile.given_Name;
+          user.lastname = profile.family_Name;
+          user.save((err, user) => {
+            if (err) {
+              return done(err, false);
+            } else {
+              return done(null, user);
+            }
+          });
+        }
+      });
+    }
+  )
+);
+
+exports.linkedinPassport = passport.use(
+  new LinkedinTokenStrategy(
+    {
+      consumerKey: config.linkedin.clientId,
+      consumerSecret: config.linkedin.clientSecret,
+      // redirectUri: config.linkedin.redirectUri,
+      scope: ['r_emailaddress', 'r_liteprofile'],
+    },
+    (accessToken, refreshToken, profile, done) => {
+      User.findOne({ linkedinId: profile.id }, (err, user) => {
+        if (err) {
+          return done(err, false);
+        }
+        if (!err && user) {
+          return done(null, user);
+        } else {
+          user = new User({ username: r_liteprofile.localizedFirstName });
+          user.linkedinId = r_liteprofile.id;
+          user.firstname = r_liteprofile.firstname;
+          user.lastname = r_liteprofile.lastname;
           user.save((err, user) => {
             if (err) {
               return done(err, false);
