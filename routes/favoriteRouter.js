@@ -1,5 +1,5 @@
 const express = require('express');
-const Favorite = require('../models/campsite');
+const Favorite = require('../models/favorites');
 const authenticate = require('../authenticate');
 const cors = require('./cors');
 
@@ -113,7 +113,7 @@ favoriteRouter
         } else {
           Favorite.create({
             user: req.user._id,
-            campsites: [req.params.campsiteId], // <-- req.params.campsiteId might need to be an array
+            campsites: [req.params.campsiteId], // <-- req.params.campsiteId needs to be an array
           })
             // favorite.save() <-- do not need
             .then((favorite) => {
