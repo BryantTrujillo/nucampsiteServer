@@ -113,7 +113,7 @@ favoriteRouter
         } else {
           Favorite.create({
             user: req.user._id,
-            campsites: [req.params.campsiteId], // <-- req.params.campsiteId needs to be an array
+            campsites: req.params.campsiteId,
           })
             // favorite.save() <-- do not need
             .then((favorite) => {
